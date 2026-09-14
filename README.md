@@ -33,7 +33,11 @@ Resolve the binary via PATH or record its absolute path/AGENTCALC_BIN. Check
 `agentcalc version`, `agentcalc exact '0.1 + 0.2'` (fraction 3/10), and
 `agentcalc eval 'sqrt(144) + 2^10'` (1036). Verify skill discovery using your host's
 listing/reload mechanism. Report the binary path, skill path, version, and any
-required reload. Use native batches and table queries for subsequent numeric work.
+required reload. For subsequent work, answer obvious single-step small-integer
+arithmetic directly (3+5, 12*4); use agentcalc for anything more involved or
+uncertain. Group independent calculations in one run and use native table queries.
+Calculate directly without creating helper files unless the task needs them.
+Use successful results without repeating the calculation in another runtime.
 ```
 
 ## Install
@@ -51,7 +55,7 @@ agentcalc eval '6*7'
 
 The installer verifies SHA-256 checksums and needs no sudo. Omit `--skill` to
 install only the binary. Use `--bin-dir DIR`, `--skill-dir DIR`, or
-`--version 0.2.0` to customize installation. Existing installations are preserved
+`--version 0.3.0` to customize installation. Existing installations are preserved
 unless you explicitly pass `--force` to upgrade. GitHub CLI may require `gh auth
 login` or a `GH_TOKEN` depending on your environment. No GitHub CLI is needed after
 installation.
@@ -181,6 +185,34 @@ Run it with `agentcalc python --file transform.py --data '[1,2,3]'`.
 A JavaScript file can define `function main(data) { return data.map(x => x*x); }`.
 Synchronous JSON-serializable return values are expected.
 
+## Short named calculations
+
+Use `run` to return multiple answers in one process without JSON request boilerplate:
+
+```sh
+agentcalc run --text <<'CALC'
+growth = eval 1000*(1+0.05/12)^24
+fraction = exact 0.1 + 0.2
+bytes = convert 3.75 GiB B
+root = root cos(x)-x 0 1
+solution = matrix solve {"a":[[2,1],[1,-1]],"b":[5,1]}
+CALC
+```
+
+Each line is `name = command arguments`. Results form one JSON object; `exact`
+returns the reduced fraction in this shorthand. Use ordinary `exact` for both
+fraction and decimal. Names must be unique. Requests are independent, and a
+failed request makes the whole run fail. Use `--input PATH` to read a saved run.
+Expressions occupy the rest of the line; for root/integrate the final two values
+are bounds, and for derivative the final value is the evaluation point.
+
+The skill's routing rule is deliberately conservative: answer obvious one-step
+small-integer arithmetic directly, such as `3+5` or `12*4`. Use the CLI when
+uncertain or for larger numbers, chained operations, exact decimals, conversions,
+functions, or data. Batch independent work, request only needed output, and avoid
+writing helper scripts or repeating successful calculations unless the task
+requires it. These choices reduce both generated code and repeated context.
+
 ## JSON and batch
 
 Successful commands return `{"ok":true,"result":...}`. Errors return `{"ok":false,"error":"..."}`. Exit code 0 means success, 1 means calculation, input, or runtime error, and 2 means usage error. Batch continues after an individual failure and exits 1 if any request failed.
@@ -248,10 +280,19 @@ inputs; `values` and grouped sums return empty containers when no rows match.
 
 ## Benchmarks
 
-See [the measured Luna benchmark report](https://github.com/pkyanam/agentcalc/blob/main/benchmarks/2026-09-14/REPORT.md) for
-correctness, actual model-token usage, and repeated runtime measurements,
-including the initial regressions and subsequent fixes. Results are workload
-specific; a CLI does not automatically save model tokens on simple arithmetic.
+The [v0.3.0 routing benchmark](benchmarks/2026-09-14/optimized-routing/REPORT.md)
+measured **13.7% fewer total model tokens** and **34.0% fewer output tokens**
+across arithmetic, data, and numerical workloads (two fresh Luna runs per arm
+per workload; all 12 final answers correct). Total includes repeated and cached
+input, skill loading, and retries. Tiny `3+5` checks used no tools and are excluded
+from those savings totals.
+
+Savings were concentrated in numerical work, including avoided dependency
+lookup failures. Arithmetic and data consumed more total tokens in aggregate;
+this is a small, tuned workload sample, not a universal or dollar-cost claim.
+The report retains earlier failures and explains the changed answer-only protocol.
+See also the [v0.2.0 benchmark](benchmarks/2026-09-14/REPORT.md), which required
+reusable scripts and did not reduce aggregate total tokens.
 
 ## Contributing
 

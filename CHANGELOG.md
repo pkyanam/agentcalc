@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0
+
+- Added concise named `run` calculations with atomic JSON output, file/stdin input, and existing numerical operations.
+- Routed obvious single-step small-integer arithmetic directly to the model; batched nontrivial calculations and removed unnecessary helper/verification work from skill guidance.
+- Published final matched Luna measurements: 13.7% fewer total tokens across three suites, with all 12 final answers correct; retained exploratory failures and workload caveats.
+- Updated the portable setup prompt and skill while preserving standard Agent Skills metadata.
+
 ## 0.2.0
 
 - Added collected batch JSON objects and per-result field selection.

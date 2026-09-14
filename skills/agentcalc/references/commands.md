@@ -19,6 +19,16 @@ agentcalc derivative 'x^3' 2
 
 `eval` uses IEEE-754 float64. Supported functions are `sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `sqrt`, `cbrt`, `abs`, `ln`, `log`, `log10`, `log2`, `exp`, `floor`, `ceil`, `round`, `pow`, `hypot`, `atan2`, `clamp`, `min`, `max`, `sum`, `mean`, `factorial`, and `choose`. `exact` supports one binary `+`, `-`, `*`, `/`, `^`, or `**` operation. `stats` accepts positional numbers, a JSON array, delimited input, or a numeric CSV column. `convert` checks dimensions across length, mass, time, temperature, bytes, angle, speed, area, and volume. Matrix operations are add, subtract, multiply, transpose, determinant, inverse, and solve; solve accepts `b` as a flat numeric vector or an n-by-1 column.
 
+## Short named runs
+
+`run --text` accepts `name = command arguments` lines through stdin or `--input PATH`.
+It returns one named object atomically; duplicate names or errors fail the run.
+Supported commands: eval, exact (fraction result), convert, stats, root, integrate,
+derivative, matrix. Expressions are unquoted inside the run text. Root/integrate
+consume two trailing numeric bounds; derivative consumes one trailing point.
+Matrix syntax is `matrix OP {"a":[...],"b":[...]}`. No shell code is executed.
+Use JSON batch requests for variables or explicit result field selection.
+
 ## Collected batches
 
 Raw `batch` accepts one JSON request per line and echoes optional ids. Collection mode is useful when several calculations are independent:

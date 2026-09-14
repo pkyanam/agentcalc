@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Installer integration test against locally built release assets.
 set -euo pipefail
-test_version=${1:-0.2.0}
+test_version=${1:-0.3.0}
 export AGENTCALC_TEST_VERSION="$test_version"
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 test_root=$(mktemp -d)

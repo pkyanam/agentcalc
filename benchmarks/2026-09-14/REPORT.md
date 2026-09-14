@@ -1,5 +1,7 @@
 # agentcalc × GPT-5.6-luna benchmark
 
+Newer results: [v0.3.0 routing and total-token optimization](optimized-routing/REPORT.md). The measurements below describe v0.2.0 and its reusable-script protocol.
+
 18 fresh Luna subagent runs across three paired workload suites and three development rounds. Every completed answer passed independent checks. After two iterations, native CLI recipes ran 3.4–4.2× faster than the ordinary-tool recipes in the final round. Output-token savings were about 26–27% for CSV and numerical work; simple arithmetic still used 35% more output tokens.
 
 These are exploratory, cold-start agent measurements, not a statistically established model benchmark. We retained the losing runs.

@@ -34,9 +34,9 @@ Returns one object keyed by name; exact yields its fraction. Also: `convert 3.75
 ## Aggregate files
 
 ```sh
-agentcalc table --input sales.csv --query '{"stats":{"op":"stats","column":"revenue","fields":["count","sum","mean","median","sample_stddev","p25","p75"]},"totals":{"op":"sum","column":"revenue","group_by":"region","where":{"status":"paid"}},"ids":{"op":"values","column":"id","where":{"status":"paid"},"sort":[{"column":"revenue","desc":true},{"column":"id"}],"limit":5},"price":{"op":"ratio","numerator":"revenue","denominator":"units"}}' --text
+agentcalc table --input sales.csv --query '{"stats":{"op":"stats","column":"revenue","fields":["count","sum","mean","median","sample_stddev","p25","p75"]},"totals":{"op":"sum","column":"revenue","group_by":"region","where":{"status":"paid"}},"ids":{"op":"values","column":"id","sort":[{"column":"revenue","desc":true},{"column":"id"}],"limit":5},"price":{"op":"ratio","numerator":"revenue","denominator":"units"}}' --text
 ```
 
-Each query is independent: apply its requested filters explicitly; sibling queries do not share filters. Match output names to the task. CSV headers or JSON object arrays. Equality `where`, then `sort`, then `limit`, then aggregation. `fields` projects stats. Only sum supports group_by. Python/Node adapters handle unsupported transformations using trusted local code.
+CSV headers or JSON object arrays. Equality `where`, then `sort`, then `limit`, then aggregation. `fields` projects stats. Only sum supports group_by. Python/Node adapters handle unsupported transformations using trusted local code.
 
 `--text` unwraps successful JSON. Errors remain JSON with `ok:false,error` and nonzero exit status. Never present an error as an answer. Additional syntax, JSON batches, script adapters and limits: [reference](references/commands.md).

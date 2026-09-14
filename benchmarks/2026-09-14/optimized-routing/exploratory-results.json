@@ -1,0 +1,987 @@
+{
+  "agents": {
+    "route1_arithmetic_cli": {
+      "arm": "cli",
+      "completed": true,
+      "completion_errors": [],
+      "correct": true,
+      "correctness_errors": [],
+      "effort": "medium",
+      "model": "gpt-5.6-luna",
+      "model_responses": 4,
+      "outer_tool_calls": 3,
+      "round": 1,
+      "suite": "arithmetic",
+      "tokens": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 110592,
+        "input_tokens": 114906,
+        "output_tokens": 578,
+        "reasoning_output_tokens": 149,
+        "total_tokens": 115484,
+        "uncached_input_tokens": 4314
+      },
+      "usage_records": [
+        {
+          "timestamp": "2026-09-14T16:05:47.716Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 26368,
+            "input_tokens": 27541,
+            "output_tokens": 168,
+            "reasoning_output_tokens": 17,
+            "total_tokens": 27709
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:05:52.753Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 27392,
+            "input_tokens": 28883,
+            "output_tokens": 221,
+            "reasoning_output_tokens": 48,
+            "total_tokens": 29104
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:05:54.933Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 28416,
+            "input_tokens": 29186,
+            "output_tokens": 62,
+            "reasoning_output_tokens": 22,
+            "total_tokens": 29248
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:05:58.360Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 28416,
+            "input_tokens": 29296,
+            "output_tokens": 127,
+            "reasoning_output_tokens": 62,
+            "total_tokens": 29423
+          }
+        }
+      ],
+      "wall_seconds": 17.141
+    },
+    "route1_arithmetic_ordinary": {
+      "arm": "ordinary",
+      "completed": true,
+      "completion_errors": [],
+      "correct": true,
+      "correctness_errors": [],
+      "effort": "medium",
+      "model": "gpt-5.6-luna",
+      "model_responses": 5,
+      "outer_tool_calls": 4,
+      "round": 1,
+      "suite": "arithmetic",
+      "tokens": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 136960,
+        "input_tokens": 141618,
+        "output_tokens": 902,
+        "reasoning_output_tokens": 317,
+        "total_tokens": 142520,
+        "uncached_input_tokens": 4658
+      },
+      "usage_records": [
+        {
+          "timestamp": "2026-09-14T16:05:54.946Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 26368,
+            "input_tokens": 27513,
+            "output_tokens": 155,
+            "reasoning_output_tokens": 20,
+            "total_tokens": 27668
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:05:59.940Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 27392,
+            "input_tokens": 28097,
+            "output_tokens": 219,
+            "reasoning_output_tokens": 18,
+            "total_tokens": 28316
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:06:06.834Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 27392,
+            "input_tokens": 28391,
+            "output_tokens": 323,
+            "reasoning_output_tokens": 216,
+            "total_tokens": 28714
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:06:09.275Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 27392,
+            "input_tokens": 28766,
+            "output_tokens": 62,
+            "reasoning_output_tokens": 8,
+            "total_tokens": 28828
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:06:12.922Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 28416,
+            "input_tokens": 28851,
+            "output_tokens": 143,
+            "reasoning_output_tokens": 55,
+            "total_tokens": 28994
+          }
+        }
+      ],
+      "wall_seconds": 25.331
+    },
+    "route1_data_cli": {
+      "arm": "cli",
+      "completed": true,
+      "completion_errors": [],
+      "correct": true,
+      "correctness_errors": [],
+      "effort": "medium",
+      "model": "gpt-5.6-luna",
+      "model_responses": 4,
+      "outer_tool_calls": 3,
+      "round": 1,
+      "suite": "data",
+      "tokens": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 110592,
+        "input_tokens": 115378,
+        "output_tokens": 859,
+        "reasoning_output_tokens": 131,
+        "total_tokens": 116237,
+        "uncached_input_tokens": 4786
+      },
+      "usage_records": [
+        {
+          "timestamp": "2026-09-14T16:06:00.492Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 26368,
+            "input_tokens": 27565,
+            "output_tokens": 180,
+            "reasoning_output_tokens": 15,
+            "total_tokens": 27745
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:06:05.563Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 27392,
+            "input_tokens": 28890,
+            "output_tokens": 230,
+            "reasoning_output_tokens": 15,
+            "total_tokens": 29120
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:06:12.129Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 28416,
+            "input_tokens": 29263,
+            "output_tokens": 254,
+            "reasoning_output_tokens": 39,
+            "total_tokens": 29517
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:06:16.454Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 28416,
+            "input_tokens": 29660,
+            "output_tokens": 195,
+            "reasoning_output_tokens": 62,
+            "total_tokens": 29855
+          }
+        }
+      ],
+      "wall_seconds": 21.829
+    },
+    "route1_data_ordinary": {
+      "arm": "ordinary",
+      "completed": true,
+      "completion_errors": [],
+      "correct": true,
+      "correctness_errors": [],
+      "effort": "medium",
+      "model": "gpt-5.6-luna",
+      "model_responses": 5,
+      "outer_tool_calls": 4,
+      "round": 1,
+      "suite": "data",
+      "tokens": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 139008,
+        "input_tokens": 154210,
+        "output_tokens": 1332,
+        "reasoning_output_tokens": 534,
+        "total_tokens": 155542,
+        "uncached_input_tokens": 15202
+      },
+      "usage_records": [
+        {
+          "timestamp": "2026-09-14T16:06:07.066Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 26368,
+            "input_tokens": 27537,
+            "output_tokens": 171,
+            "reasoning_output_tokens": 74,
+            "total_tokens": 27708
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:06:11.103Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 27392,
+            "input_tokens": 28501,
+            "output_tokens": 139,
+            "reasoning_output_tokens": 31,
+            "total_tokens": 28640
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:06:22.559Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 27392,
+            "input_tokens": 29049,
+            "output_tokens": 531,
+            "reasoning_output_tokens": 102,
+            "total_tokens": 29580
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:06:25.600Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 28416,
+            "input_tokens": 29730,
+            "output_tokens": 87,
+            "reasoning_output_tokens": 46,
+            "total_tokens": 29817
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:06:34.809Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 29440,
+            "input_tokens": 39393,
+            "output_tokens": 404,
+            "reasoning_output_tokens": 281,
+            "total_tokens": 39797
+          }
+        }
+      ],
+      "wall_seconds": 33.518
+    },
+    "route1_numerical_cli": {
+      "arm": "cli",
+      "completed": true,
+      "completion_errors": [],
+      "correct": true,
+      "correctness_errors": [],
+      "effort": "medium",
+      "model": "gpt-5.6-luna",
+      "model_responses": 3,
+      "outer_tool_calls": 2,
+      "round": 1,
+      "suite": "numerical",
+      "tokens": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 82176,
+        "input_tokens": 86077,
+        "output_tokens": 697,
+        "reasoning_output_tokens": 152,
+        "total_tokens": 86774,
+        "uncached_input_tokens": 3901
+      },
+      "usage_records": [
+        {
+          "timestamp": "2026-09-14T16:06:21.692Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 26368,
+            "input_tokens": 27544,
+            "output_tokens": 250,
+            "reasoning_output_tokens": 43,
+            "total_tokens": 27794
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:06:30.510Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 27392,
+            "input_tokens": 29065,
+            "output_tokens": 287,
+            "reasoning_output_tokens": 48,
+            "total_tokens": 29352
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:06:37.147Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 28416,
+            "input_tokens": 29468,
+            "output_tokens": 160,
+            "reasoning_output_tokens": 61,
+            "total_tokens": 29628
+          }
+        }
+      ],
+      "wall_seconds": 23.061
+    },
+    "route1_numerical_ordinary": {
+      "arm": "ordinary",
+      "completed": true,
+      "completion_errors": [],
+      "correct": true,
+      "correctness_errors": [],
+      "effort": "medium",
+      "model": "gpt-5.6-luna",
+      "model_responses": 5,
+      "outer_tool_calls": 4,
+      "round": 1,
+      "suite": "numerical",
+      "tokens": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 137984,
+        "input_tokens": 143529,
+        "output_tokens": 1456,
+        "reasoning_output_tokens": 352,
+        "total_tokens": 144985,
+        "uncached_input_tokens": 5545
+      },
+      "usage_records": [
+        {
+          "timestamp": "2026-09-14T16:06:13.852Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 26368,
+            "input_tokens": 27516,
+            "output_tokens": 167,
+            "reasoning_output_tokens": 33,
+            "total_tokens": 27683
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:06:21.674Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 27392,
+            "input_tokens": 28142,
+            "output_tokens": 383,
+            "reasoning_output_tokens": 47,
+            "total_tokens": 28525
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:06:34.486Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 27392,
+            "input_tokens": 28581,
+            "output_tokens": 663,
+            "reasoning_output_tokens": 161,
+            "total_tokens": 29244
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:06:37.275Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 28416,
+            "input_tokens": 29353,
+            "output_tokens": 97,
+            "reasoning_output_tokens": 57,
+            "total_tokens": 29450
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:06:40.946Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 28416,
+            "input_tokens": 29937,
+            "output_tokens": 146,
+            "reasoning_output_tokens": 54,
+            "total_tokens": 30083
+          }
+        }
+      ],
+      "wall_seconds": 33.361
+    },
+    "route1_tiny_cli": {
+      "arm": "cli",
+      "completed": true,
+      "completion_errors": [],
+      "correct": true,
+      "correctness_errors": [],
+      "effort": "medium",
+      "model": "gpt-5.6-luna",
+      "model_responses": 1,
+      "outer_tool_calls": 0,
+      "round": 1,
+      "suite": "tiny",
+      "tokens": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 26368,
+        "input_tokens": 27543,
+        "output_tokens": 28,
+        "reasoning_output_tokens": 17,
+        "total_tokens": 27571,
+        "uncached_input_tokens": 1175
+      },
+      "usage_records": [
+        {
+          "timestamp": "2026-09-14T16:07:31.283Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 26368,
+            "input_tokens": 27543,
+            "output_tokens": 28,
+            "reasoning_output_tokens": 17,
+            "total_tokens": 27571
+          }
+        }
+      ],
+      "wall_seconds": 2.94
+    },
+    "route1_tiny_ordinary": {
+      "arm": "ordinary",
+      "completed": true,
+      "completion_errors": [],
+      "correct": true,
+      "correctness_errors": [],
+      "effort": "medium",
+      "model": "gpt-5.6-luna",
+      "model_responses": 1,
+      "outer_tool_calls": 0,
+      "round": 1,
+      "suite": "tiny",
+      "tokens": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 26368,
+        "input_tokens": 27477,
+        "output_tokens": 38,
+        "reasoning_output_tokens": 27,
+        "total_tokens": 27515,
+        "uncached_input_tokens": 1109
+      },
+      "usage_records": [
+        {
+          "timestamp": "2026-09-14T16:07:40.665Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 26368,
+            "input_tokens": 27477,
+            "output_tokens": 38,
+            "reasoning_output_tokens": 27,
+            "total_tokens": 27515
+          }
+        }
+      ],
+      "wall_seconds": 6.515
+    },
+    "route2_arithmetic_cli": {
+      "arm": "cli",
+      "completed": true,
+      "completion_errors": [],
+      "correct": true,
+      "correctness_errors": [],
+      "effort": "medium",
+      "model": "gpt-5.6-luna",
+      "model_responses": 3,
+      "outer_tool_calls": 2,
+      "round": 2,
+      "suite": "arithmetic",
+      "tokens": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 82176,
+        "input_tokens": 85726,
+        "output_tokens": 554,
+        "reasoning_output_tokens": 149,
+        "total_tokens": 86280,
+        "uncached_input_tokens": 3550
+      },
+      "usage_records": [
+        {
+          "timestamp": "2026-09-14T16:07:24.288Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 26368,
+            "input_tokens": 27541,
+            "output_tokens": 217,
+            "reasoning_output_tokens": 50,
+            "total_tokens": 27758
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:07:29.692Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 27392,
+            "input_tokens": 28933,
+            "output_tokens": 237,
+            "reasoning_output_tokens": 64,
+            "total_tokens": 29170
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:07:32.356Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 28416,
+            "input_tokens": 29252,
+            "output_tokens": 100,
+            "reasoning_output_tokens": 35,
+            "total_tokens": 29352
+          }
+        }
+      ],
+      "wall_seconds": 15.995
+    },
+    "route2_arithmetic_ordinary": {
+      "arm": "ordinary",
+      "completed": true,
+      "completion_errors": [],
+      "correct": true,
+      "correctness_errors": [],
+      "effort": "medium",
+      "model": "gpt-5.6-luna",
+      "model_responses": 4,
+      "outer_tool_calls": 3,
+      "round": 2,
+      "suite": "arithmetic",
+      "tokens": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 111616,
+        "input_tokens": 116573,
+        "output_tokens": 1180,
+        "reasoning_output_tokens": 438,
+        "total_tokens": 117753,
+        "uncached_input_tokens": 4957
+      },
+      "usage_records": [
+        {
+          "timestamp": "2026-09-14T16:07:18.372Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 26368,
+            "input_tokens": 27513,
+            "output_tokens": 284,
+            "reasoning_output_tokens": 82,
+            "total_tokens": 27797
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:07:29.402Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 27392,
+            "input_tokens": 29003,
+            "output_tokens": 514,
+            "reasoning_output_tokens": 278,
+            "total_tokens": 29517
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:07:35.525Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 28416,
+            "input_tokens": 29847,
+            "output_tokens": 279,
+            "reasoning_output_tokens": 42,
+            "total_tokens": 30126
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:07:38.312Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 29440,
+            "input_tokens": 30210,
+            "output_tokens": 103,
+            "reasoning_output_tokens": 36,
+            "total_tokens": 30313
+          }
+        }
+      ],
+      "wall_seconds": 27.894
+    },
+    "route2_data_cli": {
+      "arm": "cli",
+      "completed": true,
+      "completion_errors": [],
+      "correct": true,
+      "correctness_errors": [],
+      "effort": "medium",
+      "model": "gpt-5.6-luna",
+      "model_responses": 3,
+      "outer_tool_calls": 2,
+      "round": 2,
+      "suite": "data",
+      "tokens": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 71936,
+        "input_tokens": 85873,
+        "output_tokens": 711,
+        "reasoning_output_tokens": 188,
+        "total_tokens": 86584,
+        "uncached_input_tokens": 13937
+      },
+      "usage_records": [
+        {
+          "timestamp": "2026-09-14T16:07:09.877Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 26368,
+            "input_tokens": 27565,
+            "output_tokens": 225,
+            "reasoning_output_tokens": 50,
+            "total_tokens": 27790
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:07:16.644Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 17152,
+            "input_tokens": 28942,
+            "output_tokens": 281,
+            "reasoning_output_tokens": 66,
+            "total_tokens": 29223
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:07:21.422Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 28416,
+            "input_tokens": 29366,
+            "output_tokens": 205,
+            "reasoning_output_tokens": 72,
+            "total_tokens": 29571
+          }
+        }
+      ],
+      "wall_seconds": 18.052
+    },
+    "route2_data_ordinary": {
+      "arm": "ordinary",
+      "completed": true,
+      "completion_errors": [],
+      "correct": true,
+      "correctness_errors": [],
+      "effort": "medium",
+      "model": "gpt-5.6-luna",
+      "model_responses": 3,
+      "outer_tool_calls": 2,
+      "round": 2,
+      "suite": "data",
+      "tokens": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 81152,
+        "input_tokens": 84812,
+        "output_tokens": 874,
+        "reasoning_output_tokens": 160,
+        "total_tokens": 85686,
+        "uncached_input_tokens": 3660
+      },
+      "usage_records": [
+        {
+          "timestamp": "2026-09-14T16:07:03.657Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 26368,
+            "input_tokens": 27537,
+            "output_tokens": 249,
+            "reasoning_output_tokens": 47,
+            "total_tokens": 27786
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:07:12.562Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 27392,
+            "input_tokens": 28345,
+            "output_tokens": 435,
+            "reasoning_output_tokens": 56,
+            "total_tokens": 28780
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:07:17.046Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 27392,
+            "input_tokens": 28930,
+            "output_tokens": 190,
+            "reasoning_output_tokens": 57,
+            "total_tokens": 29120
+          }
+        }
+      ],
+      "wall_seconds": 20.559
+    },
+    "route2_numerical_cli": {
+      "arm": "cli",
+      "completed": true,
+      "completion_errors": [],
+      "correct": true,
+      "correctness_errors": [],
+      "effort": "medium",
+      "model": "gpt-5.6-luna",
+      "model_responses": 3,
+      "outer_tool_calls": 2,
+      "round": 2,
+      "suite": "numerical",
+      "tokens": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 82176,
+        "input_tokens": 85893,
+        "output_tokens": 640,
+        "reasoning_output_tokens": 119,
+        "total_tokens": 86533,
+        "uncached_input_tokens": 3717
+      },
+      "usage_records": [
+        {
+          "timestamp": "2026-09-14T16:06:32.910Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 26368,
+            "input_tokens": 27544,
+            "output_tokens": 225,
+            "reasoning_output_tokens": 42,
+            "total_tokens": 27769
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:06:39.747Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 27392,
+            "input_tokens": 28970,
+            "output_tokens": 293,
+            "reasoning_output_tokens": 54,
+            "total_tokens": 29263
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:06:42.998Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 28416,
+            "input_tokens": 29379,
+            "output_tokens": 122,
+            "reasoning_output_tokens": 23,
+            "total_tokens": 29501
+          }
+        }
+      ],
+      "wall_seconds": 16.7
+    },
+    "route2_numerical_ordinary": {
+      "arm": "ordinary",
+      "completed": true,
+      "completion_errors": [],
+      "correct": true,
+      "correctness_errors": [],
+      "effort": "medium",
+      "model": "gpt-5.6-luna",
+      "model_responses": 6,
+      "outer_tool_calls": 5,
+      "round": 2,
+      "suite": "numerical",
+      "tokens": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 170496,
+        "input_tokens": 187037,
+        "output_tokens": 1929,
+        "reasoning_output_tokens": 411,
+        "total_tokens": 188966,
+        "uncached_input_tokens": 16541
+      },
+      "usage_records": [
+        {
+          "timestamp": "2026-09-14T16:06:42.536Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 26368,
+            "input_tokens": 27516,
+            "output_tokens": 207,
+            "reasoning_output_tokens": 37,
+            "total_tokens": 27723
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:06:53.461Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 27392,
+            "input_tokens": 28949,
+            "output_tokens": 487,
+            "reasoning_output_tokens": 165,
+            "total_tokens": 29436
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:07:01.331Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 28416,
+            "input_tokens": 29492,
+            "output_tokens": 359,
+            "reasoning_output_tokens": 31,
+            "total_tokens": 29851
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:07:14.749Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 28416,
+            "input_tokens": 29906,
+            "output_tokens": 657,
+            "reasoning_output_tokens": 96,
+            "total_tokens": 30563
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:07:17.259Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 29440,
+            "input_tokens": 30675,
+            "output_tokens": 86,
+            "reasoning_output_tokens": 44,
+            "total_tokens": 30761
+          }
+        },
+        {
+          "timestamp": "2026-09-14T16:07:20.687Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 30464,
+            "input_tokens": 40499,
+            "output_tokens": 133,
+            "reasoning_output_tokens": 38,
+            "total_tokens": 40632
+          }
+        }
+      ],
+      "wall_seconds": 47.545
+    },
+    "route2_tiny_cli": {
+      "arm": "cli",
+      "completed": true,
+      "completion_errors": [],
+      "correct": true,
+      "correctness_errors": [],
+      "effort": "medium",
+      "model": "gpt-5.6-luna",
+      "model_responses": 1,
+      "outer_tool_calls": 0,
+      "round": 2,
+      "suite": "tiny",
+      "tokens": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 26368,
+        "input_tokens": 27543,
+        "output_tokens": 34,
+        "reasoning_output_tokens": 23,
+        "total_tokens": 27577,
+        "uncached_input_tokens": 1175
+      },
+      "usage_records": [
+        {
+          "timestamp": "2026-09-14T16:07:51.106Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 26368,
+            "input_tokens": 27543,
+            "output_tokens": 34,
+            "reasoning_output_tokens": 23,
+            "total_tokens": 27577
+          }
+        }
+      ],
+      "wall_seconds": 3.398
+    },
+    "route2_tiny_ordinary": {
+      "arm": "ordinary",
+      "completed": true,
+      "completion_errors": [],
+      "correct": true,
+      "correctness_errors": [],
+      "effort": "medium",
+      "model": "gpt-5.6-luna",
+      "model_responses": 1,
+      "outer_tool_calls": 0,
+      "round": 2,
+      "suite": "tiny",
+      "tokens": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 26368,
+        "input_tokens": 27477,
+        "output_tokens": 54,
+        "reasoning_output_tokens": 43,
+        "total_tokens": 27531,
+        "uncached_input_tokens": 1109
+      },
+      "usage_records": [
+        {
+          "timestamp": "2026-09-14T16:07:42.439Z",
+          "usage": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 26368,
+            "input_tokens": 27477,
+            "output_tokens": 54,
+            "reasoning_output_tokens": 43,
+            "total_tokens": 27531
+          }
+        }
+      ],
+      "wall_seconds": 3.604
+    }
+  },
+  "notes": [
+    "Usage is per-response and deduplicated by response ID via evaluate.collect.",
+    "uncached_input_tokens = input_tokens - cached_input_tokens.",
+    "Final answer text and hidden reasoning are not stored."
+  ],
+  "prefix": "route",
+  "protocol": "optimized-routing",
+  "rounds": [
+    1,
+    2
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "release": "0.3.0",
+  "benchmark_binary_version": "0.3.0-bench",
+  "benchmark_binary_sha256": "6e4b4a5e5778fa13c6e1a885b6e3f6770d204abd81ee57c258ff3851a9a12e48",
+  "base_commit": "cd3469aac50ed93a21f3feb635013f9b4c1aa00f",
+  "source_sha256": {
+    "internal/cli/cli.go": "6af409e122e7453f9151174e856ba69c4b5e97e517d52727842f57b973a08b41",
+    "internal/cli/cli_test.go": "756cad534be9dc4b2b6a575876a78b63c176334c9af60ac0141a5ee501da6140",
+    "skills/agentcalc/SKILL.md": "8f0a7c744f3a5d6a534fcdc26bae82143247ae9d3b5cffd2eb8e9bf0040643a5",
+    "benchmarks/2026-09-14/tasks/arithmetic.txt": "ed9615b8285ea0a1d28d842513d96a4ac166621adb97e7c37bbcb87b1f94961f",
+    "benchmarks/2026-09-14/tasks/data.txt": "6176eb5e4e215b072a085733e4d5abebe4b0c780a482ba0340986256eabfd390",
+    "benchmarks/2026-09-14/tasks/numerical.txt": "8c0d6a43456be9e034ae75bf32c13ec925a1e55577ccacc819c115593de4bbbd",
+    "benchmarks/2026-09-14/tasks/sales.csv": "b259e986329e9b27e7f29f0e32d68467b0b91aac63ae84b6ff08c0559691718d",
+    "benchmarks/2026-09-14/optimized-routing/protocol.txt": "cb28203ca4933a027996a7a425ce2a5b2ba45971bd802af603877a8a3a7af11d"
+  },
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "go": "go version go1.26.5 darwin/arm64",
+  "python": "3.14.6",
+  "notes": [
+    "Binary and final implementation match; release builds embed a different version string.",
+    "Final skill includes a table filter clarification added after the benchmark binary build."
+  ]
+}

@@ -42,6 +42,7 @@ Commands:
   node 'EXPR'                     JavaScript expression with data and Math
   python|node --file PATH         Script defining main(data)
   batch                          JSON Lines requests on stdin, one response each
+  run                            Run named commands from newline-separated input
   table --query JSON             Named CSV/JSON queries: stats, sum, values, ratio
   version                        Show build version
   help                           This guide
@@ -69,6 +70,7 @@ Examples:
   agentcalc python 'sum(x*x for x in data)' --data '[1,2,3]'
   agentcalc node 'data.map(x => x * 2)' --data '[1,2,3]'
   echo '{"id":"a","command":"eval","expr":"6*7"}' | agentcalc batch
+  printf 'growth = eval 1000*(1+0.05/12)^24\nfraction = exact 0.1 + 0.2\n' | agentcalc run --text
 
 Default response: {"ok":true,"result":...}; errors: {"ok":false,"error":"..."}.
 Exit codes: 0 success, 1 calculation/input/runtime error, 2 usage error.
@@ -91,6 +93,12 @@ Floating point uses IEEE-754 float64; use exact for decimal/fraction arithmetic.
 Python/Node run trusted code with your local permissions; they are NOT sandboxed.
 Input/output limits: 8 MiB input, 1 MiB per batch line. No network or telemetry
 in core commands. Quote expressions to prevent shell expansion.
+Run syntax: NAME = COMMAND ARGUMENTS, one command per line. Supported commands
+are eval, exact, stats, convert, matrix, units, root, integrate, derivative.
+Names are identifiers; blank lines and lines beginning with # are ignored.
+Run is atomic, accepts --input PATH (or stdin), rejects duplicate names, and is
+limited to 1000 commands and 8 MiB input. In run, exact returns its fraction
+string by default; --text prints one keyed JSON object.
 `
 
 type request struct {
@@ -344,6 +352,7 @@ func Main(args []string, in io.Reader, out, stderr io.Writer, version string) in
 	collect := false
 	plain, pretty, hasData := false, false, false
 	timeout := 5 * time.Second
+	timeoutSet := false
 	fail := func(e error, code int) int {
 		if err := emit(out, nil, e, nil, false, pretty); err != nil {
 			fmt.Fprintln(stderr, err)
@@ -394,6 +403,7 @@ func Main(args []string, in io.Reader, out, stderr io.Writer, version string) in
 			case "--file":
 				file = v
 			case "--timeout":
+				timeoutSet = true
 				d, e := time.ParseDuration(v)
 				if e != nil || d <= 0 || d > 5*time.Minute {
 					return fail(errors.New("timeout must be positive and at most 5m"), 2)
@@ -432,7 +442,7 @@ func Main(args []string, in io.Reader, out, stderr io.Writer, version string) in
 	if len(vars) > 0 && cmd != "eval" {
 		return fail(errors.New("--var requires eval"), 2)
 	}
-	if (hasData || input != "") && cmd != "stats" && cmd != "matrix" && cmd != "python" && cmd != "node" && cmd != "batch" && cmd != "table" {
+	if (hasData || input != "") && cmd != "stats" && cmd != "matrix" && cmd != "python" && cmd != "node" && cmd != "batch" && cmd != "run" && cmd != "table" {
 		return fail(errors.New("this command does not accept input data"), 2)
 	}
 	if hasData && input != "" {
@@ -469,6 +479,24 @@ func Main(args []string, in io.Reader, out, stderr io.Writer, version string) in
 			return batchCollect(reader, out, plain, pretty)
 		}
 		return batch(reader, out)
+	}
+	if cmd == "run" {
+		if len(pos) > 0 || hasData || len(vars) > 0 || column != "" || file != "" || query != "" || queryFile != "" || collect || timeoutSet {
+			return fail(errors.New("run uses newline-separated input; only --input, --text, and --pretty are supported"), 2)
+		}
+		b, e := getInput()
+		if e != nil {
+			return fail(e, 1)
+		}
+		results, e := runCommands(b)
+		if e != nil {
+			return fail(e, 1)
+		}
+		if e := emit(out, results, nil, nil, plain, pretty); e != nil {
+			fmt.Fprintln(stderr, e)
+			return 1
+		}
+		return 0
 	}
 	r := request{Command: cmd, Vars: vars}
 	var result any
@@ -736,6 +764,157 @@ func batch(in io.Reader, out io.Writer) int {
 		return 1
 	}
 	return code
+}
+
+var runName = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
+
+// runCommands parses and evaluates the whole input before returning, so a bad
+// line can never produce a partial result object.
+func runCommands(data []byte) (map[string]any, error) {
+	if len(data) > 8*1024*1024 {
+		return nil, errors.New("input exceeds 8 MiB")
+	}
+	results := make(map[string]any)
+	resultBytes := 2
+	scanner := bufio.NewScanner(bytes.NewReader(data))
+	scanner.Buffer(make([]byte, 4096), 1024*1024)
+	line, count := 0, 0
+	for scanner.Scan() {
+		line++
+		text := strings.TrimSpace(scanner.Text())
+		if text == "" || strings.HasPrefix(text, "#") {
+			continue
+		}
+		count++
+		if count > 1000 {
+			return nil, errors.New("run exceeds 1000 commands")
+		}
+		name, rhs, ok := strings.Cut(text, "=")
+		name, rhs = strings.TrimSpace(name), strings.TrimSpace(rhs)
+		if !ok || !runName.MatchString(name) {
+			return nil, fmt.Errorf("line %d: expected NAME = COMMAND ARGUMENTS", line)
+		}
+		if _, exists := results[name]; exists {
+			return nil, fmt.Errorf("line %d: duplicate name %q", line, name)
+		}
+		r, err := parseRunRequest(rhs)
+		if err != nil {
+			return nil, fmt.Errorf("line %d: %w", line, err)
+		}
+		value, err := execute(r)
+		if err != nil {
+			return nil, fmt.Errorf("line %d (%s): %w", line, name, err)
+		}
+		if r.Command == "exact" {
+			value = value.(map[string]any)["fraction"]
+		}
+		encoded, err := json.Marshal(value)
+		if err != nil {
+			return nil, err
+		}
+		resultBytes += len(encoded) + len(name) + 4
+		if resultBytes > 8*1024*1024 {
+			return nil, errors.New("run output exceeds 8 MiB")
+		}
+		results[name] = value
+	}
+	if err := scanner.Err(); err != nil {
+		if strings.Contains(err.Error(), "token too long") {
+			return nil, errors.New("run line exceeds 1 MiB")
+		}
+		return nil, err
+	}
+	if count == 0 {
+		return nil, errors.New("run input contains no commands")
+	}
+	return results, nil
+}
+
+func parseRunRequest(rhs string) (request, error) {
+	fields := strings.Fields(rhs)
+	if len(fields) == 0 {
+		return request{}, errors.New("missing command")
+	}
+	cmd := fields[0]
+	r := request{Command: cmd}
+	args := strings.TrimSpace(strings.TrimPrefix(rhs, cmd))
+	switch cmd {
+	case "eval", "exact":
+		if args == "" {
+			return r, errors.New("missing expression")
+		}
+		r.Expr = args
+	case "units":
+		if args != "" {
+			return r, errors.New("units takes no arguments")
+		}
+	case "stats":
+		if len(fields) < 2 {
+			return r, errors.New("stats requires at least one number")
+		}
+		for _, s := range fields[1:] {
+			v, err := strconv.ParseFloat(s, 64)
+			if err != nil || math.IsNaN(v) || math.IsInf(v, 0) {
+				return r, fmt.Errorf("stats argument %q is not a finite number", s)
+			}
+			r.Values = append(r.Values, v)
+		}
+	case "convert":
+		if len(fields) != 4 {
+			return r, errors.New("convert expects VALUE FROM TO")
+		}
+		v, err := strconv.ParseFloat(fields[1], 64)
+		if err != nil || math.IsNaN(v) || math.IsInf(v, 0) {
+			return r, errors.New("convert value must be a finite number")
+		}
+		r.Value, r.From, r.To = v, fields[2], fields[3]
+	case "root", "integrate", "derivative":
+		need := 2 // numeric tail after the expression
+		if cmd == "derivative" {
+			need = 1
+		}
+		if len(fields) < need+2 {
+			return r, fmt.Errorf("%s expects an expression and %d numeric argument(s)", cmd, need)
+		}
+		r.Expr = strings.Join(fields[1:len(fields)-need], " ")
+		if r.Expr == "" {
+			return r, errors.New("missing expression")
+		}
+		if cmd == "derivative" {
+			var err error
+			r.X, err = strconv.ParseFloat(fields[len(fields)-1], 64)
+			if err != nil || math.IsNaN(r.X) || math.IsInf(r.X, 0) {
+				return r, errors.New("derivative point must be finite")
+			}
+		} else {
+			var err error
+			r.Lower, err = strconv.ParseFloat(fields[len(fields)-2], 64)
+			if err != nil || math.IsNaN(r.Lower) || math.IsInf(r.Lower, 0) {
+				return r, errors.New("lower bound must be finite")
+			}
+			r.Upper, err = strconv.ParseFloat(fields[len(fields)-1], 64)
+			if err != nil || math.IsNaN(r.Upper) || math.IsInf(r.Upper, 0) {
+				return r, errors.New("upper bound must be finite")
+			}
+		}
+	case "matrix":
+		if len(fields) < 3 {
+			return r, errors.New("matrix expects OP and a JSON object")
+		}
+		r.Op = fields[1]
+		payload := strings.TrimSpace(strings.TrimPrefix(args, fields[1]))
+		var matrices struct {
+			A [][]float64 `json:"a"`
+			B rightMatrix `json:"b"`
+		}
+		if err := decode([]byte(payload), &matrices); err != nil {
+			return r, fmt.Errorf("invalid matrix JSON: %w", err)
+		}
+		r.A, r.B = matrices.A, matrices.B
+	default:
+		return r, fmt.Errorf("unknown command %q", cmd)
+	}
+	return r, nil
 }
 
 // Collected batches are bounded and atomic: no partial successes hide errors.

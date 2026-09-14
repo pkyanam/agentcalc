@@ -1,0 +1,15 @@
+Controlled answer-only benchmark, 2026-09-14. Solve your assigned task accurately.
+Read only this protocol, your assigned task, and sales.csv if needed. CLI arm may
+also read the designated SKILL.md/references and CLI help. No network, installs,
+subagents, other agents/runs, product source, session logs, or golden answers.
+Ordinary arm: use Python3, Node, shell, already-installed libraries, or context
+arithmetic as normally appropriate. Do not invoke agentcalc or read its skill.
+CLI arm: follow the provided skill's routing; use agentcalc for nontrivial math
+and data transformations, with its Python/Node adapters available as fallback.
+Both arms: work efficiently, group independent operations when useful, read
+needed instruction/task files together, and stop after a successful calculation.
+Do not repeat successful calculations in another runtime solely to verify them.
+Fix observed errors. There is no tool-call count limit. Do not create scripts or
+other artifacts; this task requests answers only. Final response must be exactly
+one JSON object with requested keys, no Markdown or explanation. Do not estimate
+tokens or elapsed time; the coordinator collects actual usage independently.

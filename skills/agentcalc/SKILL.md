@@ -32,6 +32,6 @@ printf '%s\n' '{"id":1,"command":"stats","values":[1,2,3]}' \
   | agentcalc batch
 ```
 
-After installation, verify with `agentcalc version`, `agentcalc exact '0.1 + 0.2'`, and `agentcalc eval 'sqrt(144) + 2^10'`. If the binary is not on `PATH`, set the skill's command configuration to its absolute path and reload skills when the host requires it.
+After installation, verify with `agentcalc version`, `agentcalc exact '0.1 + 0.2'`, and `agentcalc eval 'sqrt(144) + 2^10'`. For a manual installation, append a `Local installation` section recording the absolute binary path.
 
 The installer appends a `Local installation` section containing the absolute binary path. Use that path when `agentcalc` is not on `PATH`, and reload skills when the host requires it.

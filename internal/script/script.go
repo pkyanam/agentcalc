@@ -162,19 +162,23 @@ func execute(ctx context.Context, lang string, argv []string, input []byte) (any
 }
 
 type limitedBuffer struct {
-	bytes.Buffer
+	buffer   bytes.Buffer
 	limit    int
 	exceeded bool
 }
+
+func (b *limitedBuffer) Len() int       { return b.buffer.Len() }
+func (b *limitedBuffer) Bytes() []byte  { return b.buffer.Bytes() }
+func (b *limitedBuffer) String() string { return b.buffer.String() }
 
 func (b *limitedBuffer) Write(p []byte) (int, error) {
 	if b.Len()+len(p) > b.limit {
 		b.exceeded = true
 		n := b.limit - b.Len()
 		if n > 0 {
-			_, _ = b.Buffer.Write(p[:n])
+			_, _ = b.buffer.Write(p[:n])
 		}
 		return n, io.ErrShortWrite
 	}
-	return b.Buffer.Write(p)
+	return b.buffer.Write(p)
 }

@@ -1,0 +1,14 @@
+{
+  "initial_binary_sha256": "2085ccc2eab38be5bac7709450b48f44cfa753994caf2b488890d49f518a3e2d",
+  "iteration2_binary_sha256": "5a8c0c43180c3385afac5703216d618b2281f37fb65b9f38d04ba1cf32a7a27a",
+  "final_binary_sha256": "9df5f8f1f524e769b40a5b62f6ad1e84e45be6ae0a5692d8777a6d23a8ef3b09",
+  "initial_git_tag": "v0.1.0",
+  "final_release": "v0.2.0",
+  "node": "v24.18.0",
+  "go": "go version go1.26.5 darwin/arm64",
+  "notes": [
+    "v2/v3 binaries built with benchmark version strings; release executable has a different hash due to version stamp.",
+    "Initial skill snapshot includes installer-added absolute path; v2/v3 were read from repo.",
+    "Final round repeats the v2 protocol unchanged; iteration 1 used protocol.txt."
+  ]
+}

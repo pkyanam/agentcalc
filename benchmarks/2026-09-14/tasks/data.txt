@@ -1,0 +1,6 @@
+Read the supplied sales.csv. Return one JSON object:
+1. revenue_stats: object containing count, sum, mean, median, sample_stddev, p25, p75 for the revenue column. Use sample stddev (n-1) and linear interpolation percentile convention: index=(n-1)*p on sorted data.
+2. region_totals: object mapping each region to summed revenue for rows with status == "paid".
+3. largest_paid_ids: IDs of the top five paid rows by revenue descending, with ascending ID breaking ties. Return integer IDs.
+4. weighted_unit_price: sum(revenue) / sum(units), across all rows.
+Do not emit all input rows or intermediate datasets.

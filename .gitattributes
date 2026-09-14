@@ -1,0 +1,2 @@
+# Preserve the exact CSV fixture bytes used in the benchmark.
+benchmarks/2026-09-14/tasks/sales.csv -text whitespace=cr-at-eol

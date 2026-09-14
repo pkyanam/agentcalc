@@ -1,0 +1,30 @@
+{
+  "model": "gpt-5.6-luna",
+  "design": "three paired workload suites, one fresh subagent per arm per suite",
+  "arms": [
+    "cli",
+    "ordinary"
+  ],
+  "suites": [
+    "arithmetic",
+    "data",
+    "numerical"
+  ],
+  "token_source": "Codex token_usage_record per-response usage; not an estimate",
+  "runtime_replay_repetitions": 30,
+  "notes": [
+    "No dollar-cost claims",
+    "CLI arm includes one skill read",
+    "Both arms may batch all work in one tool call",
+    "Concurrency may affect wall-clock comparisons",
+    "No network or dependency installation during trials"
+  ],
+  "rounds": [
+    "initial v0.1.0",
+    "iteration2 collect/table",
+    "final vector shorthand/fields"
+  ],
+  "fresh_subagent_runs": 18,
+  "csv_seed": 230914,
+  "reasoning_effort_observed": "medium"
+}

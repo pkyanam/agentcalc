@@ -1,3 +1,5 @@
 /dist/
 /agentcalc
 *.prof
+
+__pycache__/

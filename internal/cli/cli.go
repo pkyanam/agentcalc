@@ -21,6 +21,7 @@ import (
 	"github.com/pkyanam/agentcalc/internal/calc"
 	"github.com/pkyanam/agentcalc/internal/ops"
 	"github.com/pkyanam/agentcalc/internal/script"
+	"github.com/pkyanam/agentcalc/internal/table"
 )
 
 const Help = `agentcalc — precise answers, compact requests
@@ -32,8 +33,8 @@ Commands:
   exact 'NUMBER OP NUMBER'        Exact rational + - * / and integer powers
   stats [NUMBERS...]              Statistics; JSON array or CSV from stdin
   convert VALUE FROM TO          Unit conversion (case-insensitive unit names)
-  root 'EXPR' LOWER UPPER        Find a bracketed root (variable x)
-  integrate 'EXPR' LOWER UPPER   Numerical definite integral (variable x)
+  root 'EXPR' LOWER UPPER         Find a bracketed root (variable x)
+  integrate 'EXPR' LOWER UPPER    Numerical definite integral (variable x)
   derivative 'EXPR' X            Numerical derivative at x
   units                          List supported units by dimension
   matrix OP                      Read {"a":[[...]],"b":[[...]]} from stdin
@@ -41,6 +42,7 @@ Commands:
   node 'EXPR'                     JavaScript expression with data and Math
   python|node --file PATH         Script defining main(data)
   batch                          JSON Lines requests on stdin, one response each
+  table --query JSON             Named CSV/JSON queries: stats, sum, values, ratio
   version                        Show build version
   help                           This guide
 
@@ -51,7 +53,9 @@ Options:
   --var NAME=VALUE                Set an expression variable (repeatable)
   --timeout DURATION             Script timeout, e.g. 2s (default 5s, max 5m)
   --text                         Print only the result (objects remain JSON)
-  --pretty                       Indent JSON output (not batch)
+  --pretty                       Indent JSON output (batch requires --collect)
+  --collect                      Batch results as one object keyed by string id
+  --query JSON                   Named queries for table (or --query-file PATH)
   --help, -h                     Show help
 
 Examples:
@@ -72,7 +76,15 @@ Batch continues after errors and exits 1 if any request failed. IDs are echoed.
 Batch commands: eval, exact, stats, convert, matrix, units, root, integrate, derivative.
 No script execution in batch.
 Batch fields: command, id, expr, vars, values, value, from, to, op, a, b, lower, upper, x.
+Optional select picks a result object field (e.g. "fraction" for exact).
+Use batch --collect --text to get one keyed JSON object without a wrapper.
+Collect requires unique nonempty string IDs; any error returns one error object.
+Table example: --query '{"totals":{"op":"sum","column":"revenue","group_by":"region"}}'
+Table query fields: op, column, where (equality), group_by, sort [{column,desc}],
+limit, numerator, denominator, fields (stats result keys). Filters, sort, limit
+apply before aggregation.
 Matrix operations: add, subtract, multiply, transpose, determinant, inverse, solve.
+For solve, b may be [5,1] or [[5],[1]].
 Numerical calculus is approximate and assumes smooth functions; roots need a
 continuous function with a sign-changing bracket. Use finite integration bounds.
 Floating point uses IEEE-754 float64; use exact for decimal/fraction arithmetic.
@@ -82,6 +94,7 @@ in core commands. Quote expressions to prevent shell expansion.
 `
 
 type request struct {
+	Select  string             `json:"select"`
 	Lower   float64            `json:"lower"`
 	Upper   float64            `json:"upper"`
 	X       float64            `json:"x"`
@@ -95,8 +108,53 @@ type request struct {
 	To      string             `json:"to"`
 	Op      string             `json:"op"`
 	A       [][]float64        `json:"a"`
-	B       [][]float64        `json:"b"`
+	B       rightMatrix        `json:"b"`
 }
+
+// rightMatrix accepts a column-vector shorthand, matching conventional Ax=b input.
+type rightMatrix [][]float64
+
+func (m *rightMatrix) UnmarshalJSON(data []byte) error {
+	var elements []json.RawMessage
+	if e := json.Unmarshal(data, &elements); e != nil {
+		return errors.New("b must be a numeric vector or matrix")
+	}
+	if string(data) == "null" {
+		*m = nil
+		return nil
+	}
+	rows := make([][]float64, len(elements))
+	vector := -1
+	for i, raw := range elements {
+		isRow := len(raw) > 0 && raw[0] == '['
+		shape := 0
+		if isRow {
+			shape = 1
+		}
+		if vector >= 0 && vector != shape {
+			return errors.New("b cannot mix rows and scalar values")
+		}
+		vector = shape
+		numbers := []json.RawMessage{raw}
+		if isRow {
+			if e := json.Unmarshal(raw, &numbers); e != nil {
+				return e
+			}
+		}
+		rows[i] = make([]float64, len(numbers))
+		for j, n := range numbers {
+			if string(n) == "null" {
+				return errors.New("b entries must be numbers, not null")
+			}
+			if e := json.Unmarshal(n, &rows[i][j]); e != nil {
+				return errors.New("b entries must be numbers")
+			}
+		}
+	}
+	*m = rows
+	return nil
+}
+
 type response struct {
 	OK     bool   `json:"ok"`
 	Result any    `json:"result"`
@@ -105,6 +163,22 @@ type response struct {
 }
 
 func execute(r request) (any, error) {
+	result, err := executeCore(r)
+	if err != nil || r.Select == "" {
+		return result, err
+	}
+	object, ok := result.(map[string]any)
+	if !ok {
+		return nil, errors.New("select requires an object result")
+	}
+	value, ok := object[r.Select]
+	if !ok {
+		return nil, fmt.Errorf("result has no field %q", r.Select)
+	}
+	return value, nil
+}
+
+func executeCore(r request) (any, error) {
 	switch r.Command {
 	case "root":
 		return calc.Root(r.Expr, r.Lower, r.Upper)
@@ -129,6 +203,8 @@ func execute(r request) (any, error) {
 	}
 }
 
+var literalExponent = regexp.MustCompile(`[eEpP]([+-]?[0-9]+)`)
+
 func exact(expr string) (any, error) {
 	if len(expr) > 10000 {
 		return nil, errors.New("exact expression too long")
@@ -138,7 +214,7 @@ func exact(expr string) (any, error) {
 		return nil, errors.New("exact expects 'NUMBER OP NUMBER' with spaces, e.g. '1/3 + 0.2'")
 	}
 	for _, literal := range []string{parts[0], parts[2]} {
-		for _, exponent := range regexp.MustCompile(`[eEpP]([+-]?[0-9]+)`).FindAllStringSubmatch(literal, -1) {
+		for _, exponent := range literalExponent.FindAllStringSubmatch(literal, -1) {
 			n, err := strconv.ParseInt(exponent[1], 10, 64)
 			if err != nil || n < -10000 || n > 10000 {
 				return nil, errors.New("literal exponent limit is 10000")
@@ -264,6 +340,8 @@ func Main(args []string, in io.Reader, out, stderr io.Writer, version string) in
 	var pos []string
 	vars := map[string]float64{}
 	data, input, column, file := "", "", "", ""
+	query, queryFile := "", ""
+	collect := false
 	plain, pretty, hasData := false, false, false
 	timeout := 5 * time.Second
 	fail := func(e error, code int) int {
@@ -286,18 +364,26 @@ func Main(args []string, in io.Reader, out, stderr io.Writer, version string) in
 			plain = true
 			continue
 		}
+		if a == "--collect" {
+			collect = true
+			continue
+		}
 		if a == "--pretty" {
 			pretty = true
 			continue
 		}
 		switch a {
-		case "--data", "--input", "--column", "--file", "--var", "--timeout":
+		case "--data", "--input", "--column", "--file", "--var", "--timeout", "--query", "--query-file":
 			if i+1 == len(args) {
 				return fail(fmt.Errorf("%s needs a value", a), 2)
 			}
 			i++
 			v := args[i]
 			switch a {
+			case "--query":
+				query = v
+			case "--query-file":
+				queryFile = v
 			case "--data":
 				data = v
 				hasData = true
@@ -328,6 +414,15 @@ func Main(args []string, in io.Reader, out, stderr io.Writer, version string) in
 			pos = append(pos, a)
 		}
 	}
+	if collect && cmd != "batch" {
+		return fail(errors.New("--collect requires batch"), 2)
+	}
+	if (query != "" || queryFile != "") && cmd != "table" {
+		return fail(errors.New("--query and --query-file require table"), 2)
+	}
+	if query != "" && queryFile != "" {
+		return fail(errors.New("choose --query or --query-file"), 2)
+	}
 	if column != "" && cmd != "stats" {
 		return fail(errors.New("--column requires stats"), 2)
 	}
@@ -337,7 +432,7 @@ func Main(args []string, in io.Reader, out, stderr io.Writer, version string) in
 	if len(vars) > 0 && cmd != "eval" {
 		return fail(errors.New("--var requires eval"), 2)
 	}
-	if (hasData || input != "") && cmd != "stats" && cmd != "matrix" && cmd != "python" && cmd != "node" && cmd != "batch" {
+	if (hasData || input != "") && cmd != "stats" && cmd != "matrix" && cmd != "python" && cmd != "node" && cmd != "batch" && cmd != "table" {
 		return fail(errors.New("this command does not accept input data"), 2)
 	}
 	if hasData && input != "" {
@@ -358,8 +453,8 @@ func Main(args []string, in io.Reader, out, stderr io.Writer, version string) in
 		return readLimited(in)
 	}
 	if cmd == "batch" {
-		if plain || pretty || len(pos) > 0 || hasData {
-			return fail(errors.New("batch uses JSON Lines stdin/--input; no --text, --pretty, or --data"), 2)
+		if ((plain || pretty) && !collect) || len(pos) > 0 || hasData {
+			return fail(errors.New("batch uses JSON Lines stdin/--input; --text/--pretty require --collect; no --data"), 2)
 		}
 		reader := in
 		if input != "" && input != "-" {
@@ -370,12 +465,40 @@ func Main(args []string, in io.Reader, out, stderr io.Writer, version string) in
 			defer f.Close()
 			reader = f
 		}
+		if collect {
+			return batchCollect(reader, out, plain, pretty)
+		}
 		return batch(reader, out)
 	}
 	r := request{Command: cmd, Vars: vars}
 	var result any
 	var err error
 	switch cmd {
+	case "table":
+		if len(pos) != 0 || (query == "" && queryFile == "") {
+			return fail(errors.New("table requires --query JSON or --query-file PATH"), 2)
+		}
+		queryData := []byte(query)
+		if queryFile != "" {
+			f, e := os.Open(queryFile)
+			if e != nil {
+				return fail(e, 1)
+			}
+			queryData, e = readLimited(f)
+			f.Close()
+			if e != nil {
+				return fail(e, 1)
+			}
+		}
+		var queries map[string]table.Query
+		if e := decode(queryData, &queries); e != nil {
+			return fail(e, 1)
+		}
+		b, e := getInput()
+		if e != nil {
+			return fail(e, 1)
+		}
+		result, err = table.Evaluate(b, queries)
 	case "root", "integrate", "derivative":
 		want := 3
 		if cmd == "derivative" {
@@ -457,7 +580,7 @@ func Main(args []string, in io.Reader, out, stderr io.Writer, version string) in
 		}
 		var matrices struct {
 			A [][]float64 `json:"a"`
-			B [][]float64 `json:"b"`
+			B rightMatrix `json:"b"`
 		}
 		if e = decode(b, &matrices); e != nil {
 			return fail(e, 1)
@@ -565,44 +688,113 @@ func parseValues(b []byte, column string) ([]float64, error) {
 	}
 	return vals, nil
 }
+
+var requiredFields = map[string][]string{"eval": {"expr"}, "exact": {"expr"}, "stats": {"values"}, "convert": {"value", "from", "to"}, "matrix": {"op", "a"}, "root": {"expr", "lower", "upper"}, "integrate": {"expr", "lower", "upper"}, "derivative": {"expr", "x"}}
+
+func parseRequest(line []byte) (request, error) {
+	var r request
+	if e := decode(line, &r); e != nil {
+		return r, e
+	}
+	var fields map[string]json.RawMessage
+	if e := json.Unmarshal(line, &fields); e != nil {
+		return r, e
+	}
+	if raw, ok := fields["id"]; ok {
+		r.ID = raw
+	}
+	for _, name := range requiredFields[r.Command] {
+		if raw, ok := fields[name]; !ok || string(raw) == "null" {
+			return r, fmt.Errorf("%s requires field %q", r.Command, name)
+		}
+	}
+	return r, nil
+}
+
 func batch(in io.Reader, out io.Writer) int {
-	s := bufio.NewScanner(in)
-	s.Buffer(make([]byte, 4096), 1024*1024)
+	scanner := bufio.NewScanner(in)
+	scanner.Buffer(make([]byte, 4096), 1024*1024)
 	code := 0
-	for s.Scan() {
-		if len(bytes.TrimSpace(s.Bytes())) == 0 {
+	for scanner.Scan() {
+		if len(bytes.TrimSpace(scanner.Bytes())) == 0 {
 			continue
 		}
-		var r request
-		e := decode(s.Bytes(), &r)
-		var v any
+		r, e := parseRequest(scanner.Bytes())
+		var value any
 		if e == nil {
-			var fields map[string]json.RawMessage
-			e = json.Unmarshal(s.Bytes(), &fields)
-			if raw, ok := fields["id"]; ok {
-				r.ID = raw
-			}
-			required := map[string][]string{"eval": {"expr"}, "exact": {"expr"}, "stats": {"values"}, "convert": {"value", "from", "to"}, "matrix": {"op", "a"}, "root": {"expr", "lower", "upper"}, "integrate": {"expr", "lower", "upper"}, "derivative": {"expr", "x"}}
-			for _, name := range required[r.Command] {
-				if raw, ok := fields[name]; !ok || string(raw) == "null" {
-					e = fmt.Errorf("%s requires field %q", r.Command, name)
-					break
-				}
-			}
-			if e == nil {
-				v, e = execute(r)
-			}
+			value, e = execute(r)
 		}
 		if e != nil {
 			code = 1
 		}
-		if err := emit(out, v, e, r.ID, false, false); err != nil {
+		if e := emit(out, value, e, r.ID, false, false); e != nil {
 			return 1
 		}
 	}
-	if e := s.Err(); e != nil {
+	if e := scanner.Err(); e != nil {
 		emit(out, nil, e, nil, false, false)
 		return 1
 	}
 	return code
+}
+
+// Collected batches are bounded and atomic: no partial successes hide errors.
+func batchCollect(in io.Reader, out io.Writer, plain, pretty bool) int {
+	fail := func(e error) int { emit(out, nil, e, nil, false, pretty); return 1 }
+	data, e := readLimited(in)
+	if e != nil {
+		return fail(e)
+	}
+	scanner := bufio.NewScanner(bytes.NewReader(data))
+	scanner.Buffer(make([]byte, 4096), 1024*1024)
+	results := map[string]any{}
+	collectedBytes := 2
+	line := 0
+	for scanner.Scan() {
+		line++
+		if len(bytes.TrimSpace(scanner.Bytes())) == 0 {
+			continue
+		}
+		r, e := parseRequest(scanner.Bytes())
+		if e != nil {
+			return fail(fmt.Errorf("line %d: %w", line, e))
+		}
+		raw, ok := r.ID.(json.RawMessage)
+		var id string
+		if !ok || json.Unmarshal(raw, &id) != nil || id == "" {
+			return fail(fmt.Errorf("line %d: --collect requires a nonempty string id", line))
+		}
+		if _, exists := results[id]; exists {
+			return fail(fmt.Errorf("duplicate id %q", id))
+		}
+		value, e := execute(r)
+		if e != nil {
+			return fail(fmt.Errorf("%s: %w", id, e))
+		}
+		encoded, e := json.Marshal(value)
+		if e != nil {
+			return fail(e)
+		}
+		key, _ := json.Marshal(id)
+		collectedBytes += len(encoded) + len(key) + 2
+		if collectedBytes > 8*1024*1024 {
+			return fail(errors.New("collected output exceeds 8 MiB"))
+		}
+		results[id] = value
+	}
+	if e := scanner.Err(); e != nil {
+		return fail(e)
+	}
+	// Bound accumulated result size as well as input size.
+	b, e := json.Marshal(results)
+	if e != nil {
+		return fail(e)
+	}
+	if len(b) > 8*1024*1024 {
+		return fail(errors.New("collected output exceeds 8 MiB"))
+	}
+	if e := emit(out, results, nil, nil, plain, pretty); e != nil {
+		return 1
+	}
+	return 0
 }

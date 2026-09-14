@@ -1,0 +1,7 @@
+Return a JSON object with these keys and computed values:
+1. growth: 18750 compounded monthly at nominal annual rate 6.3% for 37 months. Use 18750*(1+0.063/12)^37, unrounded.
+2. exact_sum: exact reduced fraction for 123456789.123456789 + 0.000000011. Return a fraction string (integer if denominator 1).
+3. combinations: number of ways to choose 7 items from 52.
+4. gib_bytes: convert 3.75 GiB into bytes (binary GiB).
+5. fahrenheit_celsius: convert -17.3 degrees Fahrenheit to Celsius.
+6. trig: sin(pi/7)^2 + cos(pi/7)^2 + sqrt(2025).

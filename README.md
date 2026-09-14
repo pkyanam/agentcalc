@@ -7,22 +7,33 @@ A fast calculator CLI for agents. One dependency-free binary handles scientific 
 Copy and paste this prompt:
 
 ```text
-Set up agentcalc from https://github.com/pkyanam/agentcalc for your own use.
-Clone the repo into an appropriate local tools directory and inspect README.md,
-scripts/install.sh, and skills/agentcalc/SKILL.md. On macOS/Linux with GitHub CLI
-available, run `bash scripts/install.sh --skill` from the clone. This verifies the
-release checksum, installs the binary to ~/.local/bin, and installs the skill to
-${CODEX_HOME:-$HOME/.codex}/skills/agentcalc with the absolute binary path recorded.
-Preserve any existing binary or skill; inspect it before deciding whether an
-upgrade is needed. If gh is unavailable, use the manual release or Go source
-installation instructions, copy the bundled skill to your agent's skill directory,
-and record the binary's absolute path in its Local installation section.
-Verify the installed binary with `agentcalc version`, `agentcalc --help`,
-`agentcalc exact '0.1 + 0.2'` (fraction 3/10), and
-`agentcalc eval 'sqrt(144) + 2^10'` (1036). Use the absolute binary path if PATH
-has not refreshed. Report installation paths and any needed PATH or skill reload
-step. Use agentcalc for subsequent calculations instead of doing arithmetic in
-context or writing ad hoc scripts.
+Set up https://github.com/pkyanam/agentcalc for your own use. Identify your agent
+host, OS/CPU, active profile, and supported skill discovery locations first.
+Inspect the repo README, installer, and skills/agentcalc/SKILL.md.
+
+Install the latest matching binary and verify its SHA-256 checksum. On macOS/Linux
+with GitHub CLI, use `bash scripts/install.sh --skill` for the shared
+~/.agents/skills/agentcalc location, or `--agent hermes`, `--agent claude`,
+`--agent codex`, or `--skill-dir /absolute/host/skills/agentcalc` for your host.
+Don't assume every host scans ~/.agents/skills. Respect custom profile homes and
+existing installations; inspect before upgrading with --force. If the binary is
+already installed, use `bash scripts/install-skill.sh --binary /absolute/agentcalc`
+with the appropriate target. On Windows or without gh, use manual release/source
+installation and install the skill through your host's supported mechanism.
+
+The skill uses the open Agent Skills format. You can also use
+`npx skills add pkyanam/agentcalc --skill agentcalc -g -a <your-agent-id> -y`
+for supported agents; this installs the skill, not the binary. Preserve references.
+Hermes normally reads ${HERMES_HOME:-$HOME/.hermes}/skills; for a shared copy,
+configure skills.external_dirs in the active Hermes config without replacing
+existing settings. If your host has no native skill loader, read SKILL.md from
+its chosen location as task instructions. Do not claim discovery until checked.
+
+Resolve the binary via PATH or record its absolute path/AGENTCALC_BIN. Check
+`agentcalc version`, `agentcalc exact '0.1 + 0.2'` (fraction 3/10), and
+`agentcalc eval 'sqrt(144) + 2^10'` (1036). Verify skill discovery using your host's
+listing/reload mechanism. Report the binary path, skill path, version, and any
+required reload. Use native batches and table queries for subsequent numeric work.
 ```
 
 ## Install
@@ -40,7 +51,7 @@ agentcalc eval '6*7'
 
 The installer verifies SHA-256 checksums and needs no sudo. Omit `--skill` to
 install only the binary. Use `--bin-dir DIR`, `--skill-dir DIR`, or
-`--version 0.1.0` to customize installation. Existing installations are preserved
+`--version 0.2.0` to customize installation. Existing installations are preserved
 unless you explicitly pass `--force` to upgrade. GitHub CLI may require `gh auth
 login` or a `GH_TOKEN` depending on your environment. No GitHub CLI is needed after
 installation.
@@ -66,11 +77,68 @@ Or build a clone with `go build -o agentcalc ./cmd/agentcalc`. Source builds rep
 There are no third-party Go dependencies and no runtime requirements for core
 commands.
 
-The optional skill is in [`skills/agentcalc/SKILL.md`](skills/agentcalc/SKILL.md).
-The installer uses `${CODEX_HOME:-$HOME/.codex}/skills/agentcalc` and records the
-absolute executable path there. For another agent host, copy the skill into its
-supported skill directory and add a Local installation section with that path.
-Reload skills or start a new session if your host needs it.
+## Portable agent skill
+
+The [bundled skill](skills/agentcalc/SKILL.md) follows the
+[Agent Skills specification](https://agentskills.io/specification). It uses
+standard `name`, `description`, and `license` frontmatter, with additional command
+instructions in a relative `references/` directory. Both the specification's
+`skills-ref` validator and the skill-creator validator pass.
+
+`--skill` now defaults to **`~/.agents/skills/agentcalc`**. This is a shared
+convention, not a promise that every host scans that directory. Choose a target:
+
+| Installer target | Skill directory |
+| --- | --- |
+| `--agent shared` (default) | `~/.agents/skills/agentcalc` |
+| `--agent hermes` | `${HERMES_HOME:-$HOME/.hermes}/skills/agentcalc` |
+| `--agent claude` | `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/agentcalc` |
+| `--agent codex` | `${CODEX_HOME:-$HOME/.codex}/skills/agentcalc` |
+| `--skill-dir DIR` | Exact directory supplied, including `agentcalc` |
+
+For an already installed binary, install only the skill without redownloading:
+
+```sh
+bash scripts/install-skill.sh --agent shared --binary "$(command -v agentcalc)"
+bash scripts/install-skill.sh --agent hermes --binary "$(command -v agentcalc)"
+# Or a project-local directory your host recognizes:
+bash scripts/install-skill.sh --skill-dir "$PWD/.agents/skills/agentcalc"
+```
+
+The installer appends an absolute binary path when one is provided. `--force`
+updates a reviewed existing installation; otherwise it preserves existing files.
+`--print-path` on the skill-only installer previews its resolved destination.
+`AGENTS_HOME` is an agentcalc installer override for the shared root, not a
+universal host setting. Host-specific overrides are honored as shown above.
+
+**skills.sh:** its open CLI discovers this repository's `skills/agentcalc` folder
+and can copy or link it into supported hosts. These commands install only the
+skill; install the binary separately. See the [skills CLI documentation](https://github.com/vercel-labs/skills).
+
+```sh
+npx skills add pkyanam/agentcalc --list
+npx skills add pkyanam/agentcalc --skill agentcalc -g -a hermes-agent -y
+npx skills add pkyanam/agentcalc --skill agentcalc -g -a claude-code -y
+```
+
+**Hermes:** native skills belong to the active profile's Hermes home. To reuse
+one shared copy instead, add its parent directory to `skills.external_dirs` in
+the active profile's `config.yaml`, merging existing entries:
+
+```yaml
+skills:
+  external_dirs:
+    - ~/.agents/skills
+```
+
+Hermes also supports project `.hermes/skills` and `.agents/skills` directories,
+subject to its project trust mechanism. Its hub can install directly with
+`hermes skills install pkyanam/agentcalc/skills/agentcalc`. Discovery and profile
+behavior are documented in [Hermes Skills System](https://hermes-agent.nousresearch.com/docs/user-guide/features/skills).
+Claude's paths and override are documented in [Claude's directory guide](https://code.claude.com/docs/en/claude-directory).
+For other hosts, use their supported paths or the skills CLI's agent registry;
+read the skill explicitly when the host has no loader. Format portability does
+not imply identical discovery rules.
 
 ## Commands
 
@@ -94,7 +162,7 @@ agentcalc node --file transform.js --data '{"x":2}'
 
 `eval` supports scientific notation, variables, constants `pi`, `e`, `tau`, postfix factorial `!`, and `^`/`**`. Powers associate right; `-2^2` is `-4`. Functions include `sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `sqrt`, `cbrt`, `abs`, `ln`/`log`, `log10`, `log2`, `exp`, `floor`, `ceil`, `round`, `pow`, `hypot`, `atan2`, `clamp`, `min`, `max`, `sum`, `mean`, `factorial`, and `choose`. Angles use radians and `round` is half away from zero. `root`, `integrate`, and `derivative` are approximate numerical operations: roots require a continuous function and sign changing bracket, integration expects a smooth finite interval, and derivative expects a smooth function at `x`. `exact` requires spaces around its operator and performs one binary operation (`+`, `-`, `*`, `/`, `^`, or `**`) on rational numbers. Core arithmetic uses IEEE-754 `float64`; use `exact` for decimal or fraction arithmetic.
 
-`stats` accepts positional numbers, JSON arrays, delimited stdin, or numeric CSV columns. `convert` supports length, mass, time, temperature, bytes, angle, speed, area, and volume with dimensional checks. `matrix` supports add, subtract, multiply, transpose, determinant, inverse, and solve; `solve` expects `b` as an n-by-1 column vector. Unit names are case-insensitive. `b` means bytes, `kb` means 1,000 bytes, `kib` means 1,024 bytes, and `gal` means US gallons. Matrix dimensions are limited to 256×256; ill-conditioned matrices may lose precision.
+`stats` accepts positional numbers, JSON arrays, delimited stdin, or numeric CSV columns. `convert` supports length, mass, time, temperature, bytes, angle, speed, area, and volume with dimensional checks. `matrix` supports add, subtract, multiply, transpose, determinant, inverse, and solve; `solve` accepts `b` as a flat numeric vector or an n-by-1 column vector. Unit names are case-insensitive. `b` means bytes, `kb` means 1,000 bytes, `kib` means 1,024 bytes, and `gal` means US gallons. Matrix dimensions are limited to 256×256; ill-conditioned matrices may lose precision.
 
 Python and Node expressions receive JSON input as `data`; Python also has `math` and `json`, and JavaScript has `Math` and `JSON`. Script files must define `main(data)`. These optional runtimes execute trusted local code with local permissions and are not sandboxed. Use `--timeout` (default 5s, maximum 5m). Core commands make no network requests or telemetry. Script timeouts stop the
 runtime process; they are not an isolation boundary for subprocesses it launches.
@@ -140,15 +208,50 @@ printf '%s\n' \
 
 Every request also needs `command`; optional `id` is echoed in its response.
 Unknown fields are rejected. Batch requests are independent; results are not
-implicitly available to later lines. Use `--text` for just a result or `--pretty`
-for readable JSON on individual commands. Run `agentcalc --help` for all options.
+implicitly available to later lines. Use `--collect --text` on a batch to return one object keyed by nonempty string
+IDs, without launching Python or jq to reshape JSON. Collected batches require
+unique IDs and fail as one error object if any request fails. `select` picks a
+single result field, such as `fraction` from `exact`:
 
-Ordinary data input is limited to 8 MiB; batch streams allow 1 MiB per line with
-no total stream limit. Exact literals have bounded exponents and power results
+```sh
+agentcalc batch --collect --text <<'JSONL'
+{"id":"fraction","command":"exact","expr":"0.1 + 0.2","select":"fraction"}
+{"id":"root","command":"root","expr":"cos(x)-x","lower":0,"upper":1}
+JSONL
+```
+
+Use `--text` for just a result or `--pretty` for readable JSON on individual
+commands or collected batches. Run `agentcalc --help` for all options.
+
+Ordinary data and collected batches are limited to 8 MiB. Raw batch streams allow
+1 MiB per line with no total stream limit. Exact literals have bounded exponents and power results
 are capped at one million bits. The exact result includes a reduced `fraction`
 and a `decimal` rounded to 30 places. Statistics report population and sample
 variance/stddev (sample fields are absent for a single observation); percentiles
 use linear interpolation. Quote expressions to prevent shell expansion.
+
+## Native table queries
+
+Read CSV with headers or a JSON array of objects. A named query produces one
+output key; combine summaries in one process:
+
+```sh
+agentcalc table --input sales.csv --query '{"summary":{"op":"stats","column":"revenue","fields":["count","sum","mean"]},"paid_by_region":{"op":"sum","column":"revenue","group_by":"region","where":{"status":"paid"}},"top_ids":{"op":"values","column":"id","sort":[{"column":"revenue","desc":true},{"column":"id"}],"limit":5},"unit_price":{"op":"ratio","numerator":"revenue","denominator":"units"}}' --text
+```
+
+Use `--query-file PATH` for longer query objects. `where` applies AND equality
+filters; `sort` and nonnegative `limit` apply before the operation. `stats` can
+project named `fields`; only `sum` accepts `group_by`. At most 128 queries are
+accepted. Numeric CSV columns are inferred as float64, so use JSON string fields
+when identifiers must retain leading zeros. Numeric aggregation rejects empty
+inputs; `values` and grouped sums return empty containers when no rows match.
+
+## Benchmarks
+
+See [the measured Luna benchmark report](https://github.com/pkyanam/agentcalc/blob/main/benchmarks/2026-09-14/REPORT.md) for
+correctness, actual model-token usage, and repeated runtime measurements,
+including the initial regressions and subsequent fixes. Results are workload
+specific; a CLI does not automatically save model tokens on simple arithmetic.
 
 ## Contributing
 
